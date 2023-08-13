@@ -54,3 +54,18 @@ def compare_similarity(uploaded_file_content):
     # 정렬된 파일 경로를 반환합니다.
     return [file for file in sorted_files]
 
+
+def txt_to_text(file_path) -> list[str]:
+    '''
+    txt 파일을 text: [list] 로 분리
+    '''
+    with open(file_path, 'r', encoding='utf-8') as file:
+        content = [file.read()]
+    return content
+
+
+def get_all_txt_files_in_directory(directory_path):
+    '''
+    주어진 디렉토리 내의 모든 .txt 파일의 경로를 리스트로 반환합니다.
+    '''
+    return [os.path.join(directory_path, file) for file in os.listdir(directory_path) if file.endswith('.txt')]
