@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload .docx file</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <style>
         /* 여기에 필요한 스타일을 추가하세요. */
     </style>
@@ -17,18 +18,14 @@
         <input type="submit" value="Upload">
     </form>
     <div id="summaryContainer">
-        <div class="summaryBox" id="similarDocumentsBox">
-            <h2>유사한 파일</h2>
-            <!-- 여기에 유사한 파일 목록이 들어갑니다. -->
-        </div>
+        <h2>업로드 파일 요약본</h2>
         <div class="summaryBox" id="summaryBox">
-            <h2>업로드 파일 요약본</h2>
             <!-- 여기에 업로드된 파일의 요약이 들어갑니다. -->
         </div>
-    </div>
-    <div id="similarSummaryContainer">
-        <h2>유사한 파일 요약본</h2>
-        <!-- 여기에 유사한 파일들의 요약이 들어갑니다. -->
+        <div class="summaryBox" id="similarDocumentsBox">
+            <h2>업로드 파일과 유사한 파일</h2>
+            <!-- 여기에 유사한 파일 목록이 들어갑니다. -->
+        </div>
     </div>
     <script>
         $(document).ready(function() {
@@ -55,40 +52,53 @@
         function handleSummaryResponse(data) {
             renderSimilarDocuments(data.similar_documents);
             renderFileSummary(data.kobart_summary);
-            
-            if (data.similar_documents.length > 0) {
-                data.similar_documents.forEach(fetchAndRenderSimilarSummary);
-            }
-        }
-
-        function renderSimilarDocuments(docs) {
-            const html = docs.map(doc => {
-                const downloadLink = `/file/?path=${encodeURIComponent(doc[1])}`;
-                const docTitle = doc[1].split('/').pop();
-                const similarity = doc[0];
-                return `<div><a href="${downloadLink}" download="${doc[1]}">${docTitle}</a> | 유사도: ${similarity}</div>`;
-            }).join('');
-            $('#similarDocumentsBox').append(html);
         }
 
         function renderFileSummary(summary) {
-            $('#summaryBox').append(`<div>${summary}</div>`);
+            let newContent = `<div>${summary}</div>` + '<br>'
+            $('#summaryBox').append(newContent);
+        }
+
+        function renderSimilarDocuments(docs) {
+            let docNumber = 0;
+            const html = docs.map(doc => {
+                docNumber += 1;
+            const downloadLink = `/file/?path=${encodeURIComponent(doc[1])}`;
+            const docTitle = doc[1].split('/').pop();
+            const similarity = doc[0];
+            return `
+                <div class="docContainer">
+                    ${docNumber}.
+                    <br>
+                    <a href="${downloadLink}" download="${doc[1]}">${docTitle}</a> | 유사도: ${similarity}
+                    <div class="docSummary" data-path="${doc[1]}"></div>
+                    <p></p>
+                    <br>
+                </div>
+            `;
+            }).join('');
+            $('#similarDocumentsBox').html(html);
+
+            docs.forEach(fetchAndRenderSimilarSummary);
         }
 
         function fetchAndRenderSimilarSummary(doc) {
             const documentPath = doc[1];
-            const docTitle = doc[1].split('/').pop();
+            const summaryElement = $(`.docSummary[data-path="${doc[1]}"]`);
+
+            // Font Awesome 스피너 추가
+            summaryElement.html('<i class="fas fa-spinner fa-spin"></i>');
 
             $.ajax({
                 url: '/summary_by_path/',
                 type: 'POST',
                 data: { path: documentPath },
                 success: function(summaryData) {
-                    const html = `<h3>${docTitle} 요약내용</h3><div>${summaryData.kobart_summary}</div>`;
-                    $('#similarSummaryContainer').append(html);
+                    // 스피너 제거하고 요약 데이터 삽입
+                    summaryElement.html(summaryData.kobart_summary);
                 },
                 error: function() {
-                    $('#similarSummaryContainer').append(`<p>${doc[0]} 요약 중 오류가 발생했습니다.</p>`);
+                    summaryElement.html('<p>요약 중 오류가 발생했습니다.</p>');
                 }
             });
         }

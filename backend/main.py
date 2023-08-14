@@ -5,7 +5,7 @@ from module.DOC2VEC import *
 from module.SEARCH import *
 #
 from starlette.requests import Request
-from fastapi import FastAPI, File, HTTPException
+from fastapi import FastAPI, File, HTTPException, Depends
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -33,6 +33,13 @@ def load_model():
     KO-BART 객체 반환
     '''
     return model
+
+
+def load_tokenizer():
+    '''
+    KO-BART Tokenizer 반환
+    '''
+    return tokenizer
 
 
 ##########################################
@@ -63,7 +70,7 @@ async def render_search_similarity_files(request: Request):
 
 
 @app.post('/summary/')
-async def summarize_docx(file: UploadFile = File(...), model: BartForConditionalGeneration = Depends(load_model)):
+async def summarize_docx(file: UploadFile = File(...), model: BartForConditionalGeneration = Depends(load_model), tokenizer = Depends(load_tokenizer)):
     ''' 
     업로드한 파일을 요약 및 유사한 파일과 비교하는 API 입니다.
     '''
@@ -81,7 +88,7 @@ async def summarize_docx(file: UploadFile = File(...), model: BartForConditional
     similar_documents = await compare_similarity(document, file_type)
     
     # KOBART 요약
-    kobart_summary = summary_KOBART(document, model)
+    kobart_summary = summary_KOBART(document, model, tokenizer)
 
     # 유사도 비교 : 업로드된 파일과 로컬에 저장된 파일들 사이의 유사도를 비교하여 정렬된 파일 리스트를 가져옵니다.       
     return {'kobart_summary': kobart_summary, 'similar_documents': similar_documents}
@@ -96,7 +103,7 @@ def get_file(path):
 
 
 @app.post('/summary_by_path/')
-async def summary_by_path(path: str = Form(...), model: BartForConditionalGeneration = Depends(load_model)):
+async def summary_by_path(path: str = Form(...), model: BartForConditionalGeneration = Depends(load_model), tokenizer = Depends(load_tokenizer)):
     '''
     유사한 파일 요약 API 입니다.
     '''
@@ -104,7 +111,7 @@ async def summary_by_path(path: str = Form(...), model: BartForConditionalGenera
     document_path = os.path.join(os.getcwd(), path)
     document = await read_file_from_path(document_path)
     
-    kobart_summary = summary_KOBART(document, model)
+    kobart_summary = summary_KOBART(document, model, tokenizer)
     return {'kobart_summary': kobart_summary}
 
     

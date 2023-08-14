@@ -2,11 +2,10 @@ import torch
 from kobart_transformers import get_kobart_tokenizer
 
 
-def summary_KOBART(text, model):
+def summary_KOBART(text, model, tokenizer):
     '''
     KO-BART 모델로 text 를 요약합니다.
     '''
-    tokenizer = get_kobart_tokenizer()
     input_ids = tokenizer.encode(text)
     input_ids = torch.tensor(input_ids)
     input_ids = input_ids.unsqueeze(0)
