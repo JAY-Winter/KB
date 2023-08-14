@@ -17,6 +17,6 @@ def infer_file(file):
     return inferred_v
 
 
-def test_compare_similarity(inferred_v):
+def compare_similarity_doc2vec(inferred_v):
     most_similar_docs = model.docvecs.most_similar([inferred_v], topn=5)
     return most_similar_docs
