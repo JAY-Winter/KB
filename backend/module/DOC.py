@@ -18,7 +18,7 @@ def read_docx(file_path: str) -> str:
 def docx_to_text(file_path):
     doc = Document(file_path)
     return ' '.join(paragraph.text for paragraph in doc.paragraphs)
-    
+
 
 async def read_file_from_path(path: str) -> str:
     '''
@@ -43,13 +43,11 @@ def get_all_files_in_directory(directory_path, file_type):
         return [os.path.join(directory_path, file) for file in os.listdir(directory_path) if file.endswith('.txt')]
 
 
-async def compare_similarity(uploaded_file_content, file_type):
+async def compare_similarity(uploaded_file_content, file_type, search_directory_path):
     '''
     업로드한 파일과 로컬 파일의 유사도를 비교합니다.
     '''
-    # 파일이 위치한 저장장소를 기입해주세요
-    file_directory = '/Users/heyon/Desktop/KB/file'
-    all_files = get_all_files_in_directory(file_directory, file_type)
+    all_files = get_all_files_in_directory(search_directory_path, file_type)
 
     if file_type == 'docx':
         documents = [docx_to_text(file_path) for file_path in all_files]
