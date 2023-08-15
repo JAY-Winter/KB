@@ -23,10 +23,12 @@ app = FastAPI()
 app.mount('/static', StaticFiles(directory='static'), name='static')
 templates = Jinja2Templates(directory='templates')
 
+# 유사도 검색 시 업로드 파일과 유사도를 비교할 폴더 경로
+SEARCH_DIRECTORY_PATH = os.getenv('SEARCH_DIRECTORY_PATH', default='')
+
 # KOBART 모델 로딩
 model = BartForConditionalGeneration.from_pretrained('/Users/heyon/Desktop/v3')
 tokenizer = get_kobart_tokenizer()
-
 
 def load_model():
     '''
@@ -85,7 +87,7 @@ async def summarize_docx(file: UploadFile = File(...), model: BartForConditional
 
     # TF-IDF 를 통한 유사 파일 검색
     file_type = file.filename.split('.')[-1]
-    similar_documents = await compare_similarity(document, file_type)
+    similar_documents = await compare_similarity(document, file_type, SEARCH_DIRECTORY_PATH)
     
     # KOBART 요약
     kobart_summary = summary_KOBART(document, model, tokenizer)
