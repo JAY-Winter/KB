@@ -13,13 +13,10 @@ def summary_GPT(request_text):
         gpt_response = response.choices[0].text.strip()
     else:
         all_tokens = [token.text for token in nlp(prompt)]
-        print(all_tokens, len(all_tokens))
         max_tokens = 1000
         # 최대 토큰 개수를 넘지 않도록 슬라이싱
         tokens = all_tokens[:max_tokens]
         reduced_prompt = ' '.join(tokens)
-        # print(reduced_prompt)
-        # print()
         response = request_openai_summary(reduced_prompt)
     
     gpt_response = response if response else '별도의 이유로 요약되지 못 했습니다.'
