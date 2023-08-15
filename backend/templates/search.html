@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload .docx file</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* CSS 작성란 */
+    </style>
+</head>
+<body>
+    <h2>키워드로 검색하세요:</h2>
+    <input type="text" id="searchInput" placeholder="키워드를 입력하세요...">
+    <button onclick="searchKeyword()">검색</button>
+    <div id="searchContainer"></div>
+</body>
+<script>
+    function searchKeyword() {
+            // 사용자가 입력한 키워드 가져오기
+            let keyword = document.getElementById('searchInput').value;
+
+            // 서버에 요청 보내기
+            fetch(`http://127.0.0.1:8000/search/keyword?keyword=${keyword}`)
+            .then(response => response.json())
+            .then(data => {
+                // 결과를 웹 페이지에 렌더링하기
+                let container = document.getElementById('searchContainer');
+                let div = document.createElement('div');
+                div.innerText = data.results;   // 예: 결과가 텍스트라고 가정
+                data.results.forEach(item => {
+                    let div = document.createElement('div');
+                    let filePath = item[2];
+                    let fileName = item[2].split('/').pop();  // 파일 경로에서 파일명만 추출
+                    let downloadLink = '/file/?path=/Users/heyon/Desktop/KB/test/docs/' + encodeURIComponent(filePath);
+                    
+                    let a = document.createElement('a');
+                    a.href = downloadLink;
+                    a.textContent = fileName;  // 링크의 텍스트를 파일 이름으로 설정
+                    div.appendChild(a);
+                    container.appendChild(div);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        };
+</script>
+</html>

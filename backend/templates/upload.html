@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload .docx file</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <style>
-        /* CSS 작성란 */
+        /* 여기에 필요한 스타일을 추가하세요. */
     </style>
 </head>
 <body>
@@ -17,78 +18,90 @@
         <input type="submit" value="Upload">
     </form>
     <div id="summaryContainer">
-        <div class="summaryBox" id="similarDocumentsBox">
-            <!-- 좌측 박스: 유사한 파일 값 -->
-        </div>
+        <h2>업로드 파일 요약본</h2>
         <div class="summaryBox" id="summaryBox">
-            <!-- 우측 박스: 파일의 요약본 -->
+            <!-- 여기에 업로드된 파일의 요약이 들어갑니다. -->
+        </div>
+        <div class="summaryBox" id="similarDocumentsBox">
+            <h2>업로드 파일과 유사한 파일</h2>
+            <!-- 여기에 유사한 파일 목록이 들어갑니다. -->
         </div>
     </div>
-    <div id="similarSummaryContainer"></div>
-</body>
-<script>
-$(document).ready(function() {
-    $('form').on('submit', function(event) {
-        event.preventDefault(); // 기본 폼 제출을 방지
+    <script>
+        $(document).ready(function() {
+            $('form').on('submit', function(event) {
+                event.preventDefault();
 
-        var formData = new FormData(this);
+                var formData = new FormData(this);
 
-        $.ajax({
-            url: '/summary/',
-            type: 'POST',
-            data: formData,
-            success: function(data) {   
-                $('#summaryContainer').html(data);
-                // 유사한 문서의 배열을 <p> 태그로 파싱
-                    var similarDocumentsHTML = data.similar_documents.map(function(doc) {
-                        var downloadLink = "/file/?path=" + encodeURIComponent(doc[1]);
-                        let parts = doc[1].split("/");
-                        let docTitle = parts[parts.length - 1];
-                        let similarity = doc[0];
-                        return '<div>' + "<a href='" + downloadLink + "' download='" + doc[1] + "'>" + docTitle + "</a>" + "| 유사도 :" + similarity + '</div>';
-                    }).join('');
-
-                // 값을 할당
-                var similarDocumentContent = '<h3>업로드 파일과 유사한 파일</h3>' + '</div>' + similarDocumentsHTML + '</div>';
-                var summaryContent = '<h3>업로드 파일 KOBART 요약본</h3><div>' + data.kobart_summary + '</div>';
-                $('#summaryContainer').html(similarDocumentContent + summaryContent);
-
-                // 유사한 문서가 있을 경우, 해당 문서를 다시 서버에 보내 요약값을 가져옴
-                if (data.similar_documents.length > 0) {
-                    var promises = data.similar_documents.map(function(doc) {
-                        let documentPath = doc[1];
-                        let documetParts = doc[1].split("/")
-                        let documetTitle = documetParts[documetParts.length - 1];
-                        
-                        return $.ajax({
-                            url: '/summary_by_path/',  // 이 API는 파일 경로를 인자로 받아 그 내용을 요약해주는 엔드포인트여야 함
-                            type: 'POST',
-                            data: { path: documentPath }
-                        }).then(function(summaryData) {
-                            var docSummaryContent = '<h3>' + documetTitle + ' 요약내용</h3>' + '<div>' + summaryData.kobart_summary + '</div>';
-                            $('#similarSummaryContainer').append(docSummaryContent);
-                        }).catch(function() {
-                            $('#similarSummaryContainer').append('<p>' + doc[0] + ' 요약 중 오류가 발생했습니다.</p>');
-                        });
-                    });
-
-                    $.when.apply($, promises).then(function() {
-                        console.log('모든 요약이 완료되었습니다.')
-                    });
-                }
-            },
-            error: function() {
-                // AJAX 호출 실패 시 에러 메시지 표시
-                var errorMessage = '<p>요약 중 오류가 발생했습니다.</p>';
-                $('#summaryContainer').html(errorMessage);
-            },
-            cache: false,
-            contentType: false,
-            processData: false
+                $.ajax({
+                    url: '/summary/',
+                    type: 'POST',
+                    data: formData,
+                    success: handleSummaryResponse,
+                    error: function() {
+                        $('#summaryContainer').html('<p>요약 중 오류가 발생했습니다.</p>');
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+            });
         });
-    });
-});
 
-</script>
+        function handleSummaryResponse(data) {
+            renderSimilarDocuments(data.similar_documents);
+            renderFileSummary(data.kobart_summary);
+        }
 
+        function renderFileSummary(summary) {
+            let newContent = `<div>${summary}</div>` + '<br>'
+            $('#summaryBox').append(newContent);
+        }
+
+        function renderSimilarDocuments(docs) {
+            let docNumber = 0;
+            const html = docs.map(doc => {
+                docNumber += 1;
+            const downloadLink = `/file/?path=${encodeURIComponent(doc[1])}`;
+            const docTitle = doc[1].split('/').pop();
+            const similarity = doc[0];
+            return `
+                <div class="docContainer">
+                    ${docNumber}.
+                    <br>
+                    <a href="${downloadLink}" download="${doc[1]}">${docTitle}</a> | 유사도: ${similarity}
+                    <div class="docSummary" data-path="${doc[1]}"></div>
+                    <p></p>
+                    <br>
+                </div>
+            `;
+            }).join('');
+            $('#similarDocumentsBox').html(html);
+
+            docs.forEach(fetchAndRenderSimilarSummary);
+        }
+
+        function fetchAndRenderSimilarSummary(doc) {
+            const documentPath = doc[1];
+            const summaryElement = $(`.docSummary[data-path="${doc[1]}"]`);
+
+            // Font Awesome 스피너 추가
+            summaryElement.html('<i class="fas fa-spinner fa-spin"></i>');
+
+            $.ajax({
+                url: '/summary_by_path/',
+                type: 'POST',
+                data: { path: documentPath },
+                success: function(summaryData) {
+                    // 스피너 제거하고 요약 데이터 삽입
+                    summaryElement.html(summaryData.kobart_summary);
+                },
+                error: function() {
+                    summaryElement.html('<p>요약 중 오류가 발생했습니다.</p>');
+                }
+            });
+        }
+    </script>
+</body>
 </html>
