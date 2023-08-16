@@ -7,6 +7,21 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
+def get_all_txt_files_in_directory(directory_path):
+    '''
+    주어진 디렉토리 내의 모든 .txt 파일의 경로를 리스트로 반환합니다.
+    '''
+    return [os.path.join(directory_path, file) for file in os.listdir(directory_path) if file.endswith('.txt')]
+
+
+def txt_to_text(file_path):
+    '''
+    주어진 .txt 파일의 내용을 문자열로 반환합니다.
+    '''
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return file.read()
+
+
 def read_docx(file_path: str) -> str:
     '''
     주어진 경로의 .docx 파일 내용을 문자열로 반환합니다.
@@ -32,6 +47,7 @@ async def read_file_from_path(path: str) -> str:
                 return await f.read()
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
 
 def get_all_files_in_directory(directory_path, file_type):
     '''

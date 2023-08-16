@@ -1,45 +1,17 @@
+from module.SINGLETONE import MainInstance as MainInstance
+#
+from sklearn.metrics.pairwise import cosine_similarity
+#
 import os
-from pprint import pprint
-
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
 
-from sklearn.cluster import DBSCAN
-from gensim.models.doc2vec import Doc2Vec
-from sklearn.metrics.pairwise import cosine_similarity
-
-from sklearn.cluster import KMeans
-from gensim.models.doc2vec import Doc2Vec, TaggedDocument
-
-def get_all_txt_files_in_directory(directory_path):
-    '''
-    주어진 디렉토리 내의 모든 .txt 파일의 경로를 리스트로 반환합니다.
-    '''
-    return [os.path.join(directory_path, file) for file in os.listdir(directory_path) if file.endswith('.txt')]
-
-def txt_to_text(file_path):
-    '''
-    주어진 .txt 파일의 내용을 문자열로 반환합니다.
-    '''
-    with open(file_path, 'r', encoding='utf-8') as file:
-        return file.read()
-
-
-directory_path = '/Users/heyon/Desktop/KB/test/docs' 
-all_txt_file_paths = get_all_txt_files_in_directory(directory_path)
-
-# documents 리스트에 파일의 내용과 파일 경로를 함께 저장합니다.
-documents = [(txt_to_text(file_path), directory_path+file_path) for file_path in all_txt_file_paths]
-
-# TF-IDF 벡터화
-vectorizer = TfidfVectorizer()
-
-# 파일의 내용만을 사용하여 TF-IDF 벡터화를 수행합니다.
-tfidf_matrix = vectorizer.fit_transform([doc[0] for doc in documents])
-
-# 새로운 키워드에 대한 유사도 계산
 def recommend_docs_TF_IDF(keyword):
+    '''
+    입력받은 키워드에 대한 유사한 파일 검색 API 입니다.
+    '''
+    documents = MainInstance.get_instance().get_documents()
+    vectorizer = MainInstance.get_instance().get_vectorizer()
+    tfidf_matrix = MainInstance.get_instance().get_tfidf_matrix()
     keyword_vector = vectorizer.transform([keyword])
 
     # 키워드와 각 문서 사이의 코사인 유사도 계산
