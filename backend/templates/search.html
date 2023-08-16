@@ -33,7 +33,7 @@
                     let div = document.createElement('div');
                     let filePath = item[2];
                     let fileName = item[2].split('/').pop();  // 파일 경로에서 파일명만 추출
-                    let downloadLink = '/file/?path=/Users/heyon/Desktop/KB/test/docs/' + encodeURIComponent(filePath);
+                    let downloadLink = '/file/?path=' + encodeURIComponent(filePath);
                     
                     let a = document.createElement('a');
                     a.href = downloadLink;

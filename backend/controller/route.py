@@ -1,3 +1,4 @@
+from module.SINGLETONE import MainInstance
 from module.DOC import *
 from module.SEARCH import *
 from module.KOBART import summary_KOBART
@@ -98,7 +99,6 @@ def get_file(path):
     '''
     유사한 파일 다운로드 API 입니다.
     '''
+    path = MainInstance.get_instance().get_SEARCH_DIRECTORY_PATH() + '/' + path
+    print('path : ', path)
     return FileResponse(path, filename=path)
-
-
-from fastapi import Request
