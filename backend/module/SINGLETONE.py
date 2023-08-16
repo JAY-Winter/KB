@@ -16,7 +16,8 @@ class Main():
         self.SEARCH_DIRECTORY_PATH = os.getenv('SEARCH_DIRECTORY_PATH', default='')
 
         # KOBART 모델 로딩
-        self.model = BartForConditionalGeneration.from_pretrained('/Users/heyon/Desktop/v3')
+        self.KOBART_MODEL_PATH = os.getenv('KOBART_MODEL_PATH', default='')
+        self.model = BartForConditionalGeneration.from_pretrained(self.KOBART_MODEL_PATH)
         self.tokenizer = get_kobart_tokenizer()    
 
         # 검색 폴더 내 문서 변수화
