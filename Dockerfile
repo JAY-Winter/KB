@@ -18,8 +18,6 @@ RUN pip install python-multipart
 # GitHub 저장소 다운로드
 WORKDIR /app
 RUN git clone https://github.com/JAY-Winter/KB.git
-# RUN wget https://github.com/JAY-Winter/KB/archive/refs/heads/main.zip
-# RUN unzip main.zip
 
 # 테스트 파일 압축해제
 WORKDIR /app/KB
@@ -29,11 +27,6 @@ RUN unzip file.zip
 WORKDIR /app/KB
 RUN wget https://github.com/JAY-Winter/KB/raw/main/ko-bart.zip?download=
 RUN unzip 'ko-bart.zip?download='
-
-# static 폴더 생성
-# WORKDIR /app/KB-main/backend
-WORKDIR /app/KB/backend
-RUN mkdir static
 
 # FastAPP 서버 구동
 WORKDIR /app/KB/backend
