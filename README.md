@@ -37,13 +37,13 @@ rubat0/kb-fast-app
 ## 1. 키워드 별 유사한 파일 찾기
 
 1. http://127.0.0.1:8000/ 방문
-2. ![image-20230817162852110](/Users/heyon/Desktop/KB/assets/image-20230817162852110.png) 
+2. ![image-20230817162852110](./assets/image-20230817162852110.png) 
 
 **키워드로 비슷한 파일 찾기** 클릭
 
 3. 키워드 입력
 
-![image-20230817162933617](/Users/heyon/Desktop/KB/assets/image-20230817162933617.png)
+![image-20230817162933617](./assets/image-20230817162933617.png)
 
 - 해당 키워드와 유사한 파일 상위 5개 추천
 
@@ -51,7 +51,7 @@ rubat0/kb-fast-app
 
 ## 2. 업로드 파일과 유사한 파일 찾기
 
-1. ![image-20230817162852110](/Users/heyon/Desktop/KB/assets/image-20230817162852110.png)
+1. ![image-20230817162852110](./assets/image-20230817162852110.png)
 
 **업로드해서 비슷한 파일 찾기** 클릭
 
@@ -61,6 +61,6 @@ rubat0/kb-fast-app
 
    - 유사한 파일 요약 시, 비동기 처리로 우선 요약 처리된 파일부터 렌더링
 
-   ![image-20230817163123588](/Users/heyon/Desktop/KB/assets/image-20230817163123588.png)
+   ![image-20230817163123588](./assets/image-20230817163123588.png)
 
 4. 파일 다운로드 및 확인
