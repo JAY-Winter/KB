@@ -19,7 +19,6 @@ def recommend_docs_TF_IDF(keyword):
 
     # 상위 5개 유사도 인덱스
     most_similar_indices = cosine_similarities.argsort()[-5:][::-1]
-
     # 추천된 문서, 그 문서의 유사도 값, 파일명을 반환
     recommended_docs_with_scores = sorted([(documents[i][0], cosine_similarities[i], os.path.basename(documents[i][1])) for i in most_similar_indices], key=lambda item: -item[1]) 
     return recommended_docs_with_scores

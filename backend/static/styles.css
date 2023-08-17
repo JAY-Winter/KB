@@ -1,0 +1,147 @@
+/* @font-face {
+    font-family: 'Pretendard-Regular';
+    src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+} */
+
+
+body {
+    background-color: #f7f7f7; /* 원하는 색상으로 변경하세요 */
+    overflow-x: hidden;
+    font-family: 'Pretendard', sans-serif; /* Fallback: sans-serif 글꼴로 지정 */
+}
+
+
+.centered-container {    
+    text-align: center;
+    width: 100%; /* 화면 전체 가로 크기로 설정 */
+    box-sizing: border-box; /* 패딩과 테두리를 포함한 크기로 설정 */
+    height: 50vh;
+    margin-top: 10%;
+    position: relative;
+    z-index: 1;
+
+}
+
+.centered-container::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: linear-gradient(to bottom, transparent, #f7f7f7); 
+    z-index: -1;
+    clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 100%);
+}
+
+
+.main-text {
+    font-size: 350%;
+    margin-bottom: 20px;
+    background-image: linear-gradient(90deg, #00084d 0%, #086dd7 100%);
+    display: inline-block;     /* 텍스트 블록의 크기에 배경이 적용되도록 함 */
+    -webkit-background-clip: text; /* gradient를 텍스트에만 적용 */
+    color: transparent;          /* 텍스트의 실제 색상을 투명하게 만들어 gradient만 보이게 함 */
+}
+
+#searchBtn {
+    height: 100%;
+    border-radius: 10px;
+}
+
+
+#fileInput {
+    position: absolute;   /* 절대적 위치 설정 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;           /* 투명하게 설정 */
+    cursor: pointer;      /* 마우스 오버 시 포인터 아이콘 표시 */
+}
+
+
+#searchBar {
+    height: 100%;
+    width: 15%;
+    text-align: center;
+    margin-right: 0.25%;
+    border-radius: 10px;
+}
+
+
+.search-container {
+    display: flex; 
+    justify-content: center;
+    align-items: start; /* 컨테이너의 높이에 따라 상단에 정렬됩니다. */
+}
+
+
+#loadingMessage {
+    position: absolute; /* 절대 위치 지정 */
+    top: 80%; /* 상단으로부터의 위치 */
+    left: 50%; /* 왼쪽으로부터의 위치 */
+    transform: translate(-50%, -50%); /* 요소의 중심을 기준으로 배치 */
+    
+    padding: 10px;
+    background-color: #eee;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    z-index: 100; /* 다른 요소 위에 나타나게 합니다. */
+}
+
+#summary-container {
+    flex: 0 0 20%; /* flex-grow, flex-shrink, flex-basis 순서로 적용. 20% 고정 너비 */
+    margin-right: 5%;
+    margin-top: 2%;
+}
+
+ 
+#result-container {
+    flex: 1; /* 나머지 공간을 채웁니다. */
+    margin-top: 2%;
+    border-right: 1px solid rgba(103, 100, 100, 0.216); /* 50% 투명도를 가진 검은색 */
+    margin-right: 2%;
+}
+
+
+.main-container {
+    height: 40px;
+    text-align: center;
+    display: flex; 
+    justify-content: center;
+}
+
+#uploadBtn {   
+    position: relative;   /* 상대적 위치 설정 */
+    width: 10%;
+    height: 100%;
+    margin-left: 2%;
+    border-radius: 10px;
+    text-align: center;
+    background-color: white;
+    border: 1px solid #007bff;
+    color: #007bff;
+    overflow: hidden;
+}
+
+
+/* 화면 크기가 480px 이하일 때의 스타일 */
+@media (max-width: 480px) {
+    #uploadBtn {
+        font-size: 12px;   /* 글씨 크기를 작게 조절 */
+    }
+}
+
+
+.result-text {
+    text-align: left;
+    font-size: 18px;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    margin-left: 5%;  /* 원하는 여백만큼 */
+    margin-right: 5%;
+}
+
