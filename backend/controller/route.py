@@ -11,6 +11,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi import UploadFile, HTTPException, Form, Depends, File, HTTPException
 #
 from transformers.models.bart import BartForConditionalGeneration
+#
+from io import BytesIO
 
 
 # Router 설정
