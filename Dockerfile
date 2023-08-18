@@ -14,6 +14,8 @@ RUN pip install torch
 RUN pip install kobart_transformers
 RUN pip install transformers
 RUN pip install python-multipart
+RUN pip install redis
+
 
 # GitHub 저장소 다운로드
 WORKDIR /app
