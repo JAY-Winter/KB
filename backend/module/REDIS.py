@@ -4,7 +4,7 @@ class DocumentComparer:
     _instance = None
 
     def __init__(self):
-        self.redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+        self.redis_client = redis.StrictRedis(host='redis', port=6379, db=0)
 
     def compare_similarity(self, content):
         # content를 키로 해시를 생성합니다.
