@@ -19,15 +19,20 @@ class Main():
         self.KOBART_MODEL_PATH = os.getenv('KOBART_MODEL_PATH', default='')
         self.model = BartForConditionalGeneration.from_pretrained(self.KOBART_MODEL_PATH)
         self.tokenizer = get_kobart_tokenizer()    
-
+        
         # 검색 폴더 내 문서 변수화
         self.documents = []
-        docx_files = get_all_files_in_directory(self.SEARCH_DIRECTORY_PATH, 'docx')
-        txt_files = get_all_files_in_directory(self.SEARCH_DIRECTORY_PATH, 'txt')
+        self.all_files = []
 
-        # # documents 리스트에 파일의 내용과 파일 경로를 함께 저장합니다.
-        self.documents += [(txt_to_text(file_path), self.SEARCH_DIRECTORY_PATH+file_path) for file_path in txt_files]
-        self.documents += [(read_docx(file_path), self.SEARCH_DIRECTORY_PATH+file_path) for file_path in docx_files]
+        txt_files = get_all_files_in_directory(self.SEARCH_DIRECTORY_PATH, 'txt')
+        docx_files = get_all_files_in_directory(self.SEARCH_DIRECTORY_PATH, 'docx')
+        
+        self.all_files += txt_files
+        self.all_files += docx_files
+
+        # documents 리스트에 파일의 내용과 파일 경로를 함께 저장합니다.
+        self.documents += [(txt_to_text(file_path), file_path) for file_path in txt_files]
+        self.documents += [(docx_to_text(file_path), file_path) for file_path in docx_files]
 
         # SEARCH_DIRECTORY 내 문서 TF-IDF
         self.vectorizer = TfidfVectorizer()
@@ -62,6 +67,10 @@ class Main():
 
     def get_documents(self):
         return self.documents
+
+
+    def get_all_files(self):
+        return self.all_files
 
 
 class MainInstance():

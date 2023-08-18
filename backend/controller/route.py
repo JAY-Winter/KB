@@ -53,19 +53,19 @@ async def summarize_docx(file: UploadFile = File(...), model: BartForConditional
     '''
     if file.filename.endswith('.docx'):
         file_contents = await file.read()
-        document = read_docx(BytesIO(file_contents))    
+        uploaded_file_content = read_docx(BytesIO(file_contents))    
     elif file.filename.endswith('.txt'):
         file_contents = await file.read()
-        document = file_contents.decode('utf-8')
+        uploaded_file_content = file_contents.decode('utf-8')
     else:
         raise HTTPException(status_code=400, detail='Invalid file type')
-
+    
     # TF-IDF 를 통한 유사 파일 검색
     file_type = file.filename.split('.')[-1]
-    similar_documents = await compare_similarity(document, file_type, MainInstance.get_instance().get_SEARCH_DIRECTORY_PATH())
+    similar_documents = await compare_similarity(uploaded_file_content, file_type, MainInstance.get_instance().get_SEARCH_DIRECTORY_PATH())
     
     # KOBART 요약
-    kobart_summary = summary_KOBART(document, model, tokenizer)
+    kobart_summary = summary_KOBART(uploaded_file_content, model, tokenizer)
 
     # 유사도 비교 : 업로드된 파일과 로컬에 저장된 파일들 사이의 유사도를 비교하여 정렬된 파일 리스트를 가져옵니다.       
     return {'kobart_summary': kobart_summary, 'similar_documents': similar_documents}
@@ -77,8 +77,7 @@ async def summary_by_path(path: str = Form(...), model: BartForConditionalGenera
     유사한 파일 요약 API 입니다.
     '''
     # 파일 경로에서 실제 문서 읽기
-    document_path = os.path.join(os.getcwd(), path)
-    document = await read_file_from_path(document_path)
+    document = await read_file_from_path(path)
     
     kobart_summary = summary_KOBART(document, model, tokenizer)
     return {'kobart_summary': kobart_summary}
@@ -101,6 +100,5 @@ def get_file(path):
     '''
     유사한 파일 다운로드 API 입니다.
     '''
-    path = MainInstance.get_instance().get_SEARCH_DIRECTORY_PATH() + '/' + path
-    print('path : ', path)
-    return FileResponse(path, filename=path)
+    filename = os.path.basename(path)
+    return FileResponse(path, filename=filename)

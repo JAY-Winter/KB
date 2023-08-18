@@ -23,6 +23,7 @@
                 Future Finance
                 A.l. Challenge</h5>
             <br>
+            <br>
             <div class="main-container">
                 <input id="searchBar" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-controls="matches" placeholder="키워드 검색 또는 파일 업로드" aria-expanded="false" aria-live="polite" class="form-control">
                 <button id="searchBtn" class="btn btn-primary me-3">검색</button>
@@ -61,8 +62,6 @@
 
 document.getElementById("searchBtn").addEventListener("click", function(e) {
     // 문자열 검색 API 호출 코드 작성
-    console.log("키워드 검색");
-
     let container = document.getElementById('result-container');
     let div = document.createElement('div');  // 'div'로 수정
     
@@ -102,7 +101,7 @@ document.getElementById("fileInput").addEventListener("change", function() {
 });
 
 function searchKeyword() {
-            // 사용자가 입력한 키워드 가져오기
+    // 사용자가 입력한 키워드 가져오기
     let keyword = document.getElementById('searchBar').value;
 
     // 서버에 요청 보내기
@@ -116,31 +115,39 @@ function searchKeyword() {
         let div = document.createElement('div');
         div.innerText = data.results;  
         let docNumber = 0;
-        console.log(data)
+
         data.results.forEach(item => {
             docNumber += 1;
-            let div = document.createElement('div');
-            div.classList.add('result-text');  // 'result-text' 클래스 추가
-
             let filePath = item[2];
             let fileName = item[2].split('/').pop();  // 파일 경로에서 파일명만 추출
+            let recommend = (item[1] * 100).toFixed(2);
             let downloadLink = '/file/?path=' + encodeURIComponent(filePath);
-            
-            let content = `${docNumber}`
+
             let a = document.createElement('a');
             a.href = downloadLink;
             a.textContent = fileName;  // 링크의 텍스트를 파일 이름으로 설정
             div.append(docNumber + '.');
             div.appendChild(a);
-            container.appendChild(div);
-            console.log(filePath)
+            
+            let content = `
+            <div class="result-text">
+                ${docNumber}. 
+                <br>
+                <a href="${downloadLink}">${fileName}</a> | 추천도 : ${recommend}%
+                <div class="docSummary" data-path="${filePath}"></div>
+            </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', content);
+            $(`.docSummary[data-path="${filePath}"]`).html('<i class="fas fa-spinner fa-spin"></i>')
+
             $.ajax({
                 url: '/summary_by_path/',
                 type: 'POST',
                 data: { path: filePath },
                 success: function(summaryData) {
                     // 스피너 제거하고 요약 데이터 삽입
-                    console.log(data)
+                    const summaryElement = $(`.docSummary[data-path="${filePath}"]`)
                     summaryElement.html(summaryData.kobart_summary);
                 },
                 error: function() {
@@ -195,7 +202,6 @@ function renderSimilarDocuments(docs) {
 function fetchAndRenderSimilarSummary(doc) {
     const documentPath = doc[1];
     const summaryElement = $(`.docSummary[data-path="${doc[1]}"]`);
-    console.log(doc)
     // Font Awesome 스피너 추가
     summaryElement.html('<i class="fas fa-spinner fa-spin"></i>');
 

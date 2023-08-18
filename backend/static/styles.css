@@ -1,9 +1,9 @@
-/* @font-face {
+@font-face {
     font-family: 'Pretendard-Regular';
     src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
     font-weight: 400;
     font-style: normal;
-} */
+}
 
 
 body {
@@ -53,19 +53,36 @@ body {
 
 
 #fileInput {
-    position: absolute;   /* 절대적 위치 설정 */
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 100px;
     height: 100%;
-    opacity: 0;           /* 투명하게 설정 */
-    cursor: pointer;      /* 마우스 오버 시 포인터 아이콘 표시 */
+    opacity: 0;
+    cursor: pointer;
+}
+
+
+#uploadBtn {   
+    position: relative;
+    /* min-width: 100px;  최소 너비 설정 */
+    width: 100px;       /* 너비를 내용에 맞게 자동 조정 */
+    height: 100%;
+    margin-left: 20px;
+    padding: 5px 10px;  /* 좌우 패딩 추가 */
+    border-radius: 10px;
+    text-align: center;
+    background-color: white;
+    border: 1px solid #007bff;
+    color: #007bff;
+    overflow: hidden;
+    white-space: nowrap; /* 텍스트가 줄바꿈 되지 않도록 설정. 필요에 따라 삭제 가능 */
 }
 
 
 #searchBar {
     height: 100%;
-    width: 15%;
+    width: 225px;
     text-align: center;
     margin-right: 0.25%;
     border-radius: 10px;
@@ -102,7 +119,9 @@ body {
 #result-container {
     flex: 1; /* 나머지 공간을 채웁니다. */
     margin-top: 2%;
+    margin-bottom: 10%;
     border-right: 1px solid rgba(103, 100, 100, 0.216); /* 50% 투명도를 가진 검은색 */
+    margin-left: 2%;
     margin-right: 2%;
 }
 
@@ -114,34 +133,13 @@ body {
     justify-content: center;
 }
 
-#uploadBtn {   
-    position: relative;   /* 상대적 위치 설정 */
-    width: 10%;
-    height: 100%;
-    margin-left: 2%;
-    border-radius: 10px;
-    text-align: center;
-    background-color: white;
-    border: 1px solid #007bff;
-    color: #007bff;
-    overflow: hidden;
-}
-
-
-/* 화면 크기가 480px 이하일 때의 스타일 */
-@media (max-width: 480px) {
-    #uploadBtn {
-        font-size: 12px;   /* 글씨 크기를 작게 조절 */
-    }
-}
-
-
 .result-text {
     text-align: left;
     font-size: 18px;
     margin-top: 2%;
-    margin-bottom: 2%;
+    margin-bottom: 5%;
     margin-left: 5%;  /* 원하는 여백만큼 */
     margin-right: 5%;
+    border-bottom: 1px solid rgba(103, 100, 100, 0.216); /* 50% 투명도를 가진 검은색 */
+    padding-bottom: 5%;
 }
-
