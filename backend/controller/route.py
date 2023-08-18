@@ -62,7 +62,8 @@ async def summarize_docx(file: UploadFile = File(...), model: BartForConditional
     
     # TF-IDF 를 통한 유사 파일 검색
     file_type = file.filename.split('.')[-1]
-    similar_documents = await compare_similarity(uploaded_file_content, file_type, MainInstance.get_instance().get_SEARCH_DIRECTORY_PATH())
+    uploaded_file_name = file.filename
+    similar_documents = await compare_similarity(uploaded_file_name ,uploaded_file_content, file_type, MainInstance.get_instance().get_SEARCH_DIRECTORY_PATH())
     
     # KOBART 요약
     kobart_summary = summary_KOBART(uploaded_file_content, model, tokenizer)
@@ -76,11 +77,26 @@ async def summary_by_path(path: str = Form(...), model: BartForConditionalGenera
     '''
     유사한 파일 요약 API 입니다.
     '''
-    # 파일 경로에서 실제 문서 읽기
-    document = await read_file_from_path(path)
-    
-    kobart_summary = summary_KOBART(document, model, tokenizer)
-    return {'kobart_summary': kobart_summary}
+    from main import Redis_Instance
+    from main import MainInstance as MainInstance
+
+    # Redis 를 활용한 Cache 적용
+    redis_client = Redis_Instance.redis_client
+    SEARCH_DIRECTORY_PATH = MainInstance.get_instance().get_SEARCH_DIRECTORY_PATH()
+    hash_key = 'summaryAPI' +  SEARCH_DIRECTORY_PATH + '/' + path
+
+    cached_result = redis_client.get(hash_key)
+    if cached_result:
+        return eval(cached_result.decode('utf-8'))
+    else:
+        # 파일 경로에서 실제 문서 읽기
+        document = await read_file_from_path(path)  
+        
+        kobart_summary = summary_KOBART(document, model, tokenizer)
+
+        results = {'kobart_summary': kobart_summary}
+        redis_client.set(hash_key, str(results), ex=3600)
+        return results
 
     
 @router.get('/search/keyword')

@@ -26,6 +26,12 @@ async def startup_event():
     from controller.route import router
     app.include_router(router, prefix='', tags=['search'])
 
+    # Redis Instance 생성
+    from module.REDIS import DocumentComparer
+    global Redis_Instance
+    Redis_Instance = DocumentComparer()
+
+
 # 서버 시작 시 이벤트 핸들러 호출
 app.add_event_handler('startup', startup_event)
 

@@ -104,13 +104,20 @@ function searchKeyword() {
     // 사용자가 입력한 키워드 가져오기
     let keyword = document.getElementById('searchBar').value;
 
+    // 요청을 보내기 전에 메시지를 추가합니다.
+    $('.search-container').append('<div id="loadingMessage">검색 중 입니다...</div>');
+
     // 서버에 요청 보내기
     fetch(`http://127.0.0.1:8000/search/keyword?keyword=${keyword}`)
     .then(response => response.json())
     .then(data => {
+        // 메시지를 숨깁니다.
+        $('#loadingMessage').remove();
+        
         // 결과를 웹 페이지에 렌더링하기
         let container = document.getElementById('result-container');
         container.innerHTML = '';
+
 
         let div = document.createElement('div');
         div.innerText = data.results;  
