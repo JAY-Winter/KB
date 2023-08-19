@@ -24,11 +24,14 @@ RUN git clone https://github.com/JAY-Winter/KB.git
 # 테스트 파일 압축해제
 WORKDIR /app/KB
 RUN unzip file.zip
+RUN rm -rf file.zip
 
 # Ko-BART 모델 다운로드 및 압축 해제
 WORKDIR /app/KB
 RUN wget https://github.com/JAY-Winter/KB/raw/main/ko-bart.zip?download=
 RUN unzip 'ko-bart.zip?download='
+RUN rm -rf ko-bart.zip
+RUN rm -rf 'ko-bart.zip?download='
 
 # FastAPP 서버 구동
 WORKDIR /app/KB/backend
