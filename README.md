@@ -91,3 +91,5 @@ docker-compose up -d
 
   ![image-20230819152937296](./assets/image-20230819152937296.png)
 
+# 2.
+
