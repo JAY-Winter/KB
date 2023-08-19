@@ -18,51 +18,50 @@
 ## 1. 도커 컨테이너 구동
 
 ```
-docker run -itd \
---name kb-fast \
--p 8000:8000 \
--e SEARCH_DIRECTORY_PATH='/app/KB/file' \
--e KOBART_MODEL_PATH='/app/KB/ko-bart' \
-rubat0/kb-fast-app
+# Dockerfile 다운로드
+wget https://raw.githubusercontent.com/JAY-Winter/KB/main/Dockerfile
+
+# Docker-Compose 파일 다운로드
+wget https://raw.githubusercontent.com/JAY-Winter/KB/main/docker-compose.yml
+
+# 구동 명령어
+docker-compose up -d
 ```
 
-1. `rubat0/kb-fast-app` : 배포 도커 이미지를 활용하여 컨테이너 구동
-2. `-e SEARCH_DIRECTORY_PATH` : 파일 유사도 검색 시, 조회할 폴더 경로 환경변수 지정
-3. `-e KOBART_MODEL_PATH` : 파일 요약 시, 사용할 KO-BART 모델 경로 환경변수 지정
+- 같은 경로에 다운로드 후 명령어 시행
 
 ---
 
 # TEST
 
+## 0. 도커 컨테이너 구동(위 내용 참고)
+
 ## 1. 키워드 별 유사한 파일 찾기
 
-1. http://127.0.0.1:8000/ 방문
+1. http://127.0.0.1:8000/ **메인 페이지 방문**
 
-2. **키워드로 비슷한 파일 찾기** 클릭
+​	![image-20230819150741463](./assets/image-20230819150741463.png)
 
-   ![image-20230817162852110](./assets/image-20230817162852110.png) 
+2. **키워드 검색**
+
+- 비동기 요청 처리로 요약이 **먼저 처리된 문서부터** 요약 내용을 렌더링함
+- 해당 키워드와 관련된 문서 5개 추천
+
+<img src="./assets/image-20230819150911536.png" alt="image-20230819150911536" style="zoom:50%;" />
+
+![image-20230819151017771](./assets/image-20230819151017771.png)
+
+2. **파일 업로드 검색 기능**
+
+   - 현재 버전에선 `txt`, `docx`  파일만 업로드 가능
+   - 업로드 파일 요약본 제공
+   - 업로드 파일과 **유사한 파일 5개 추천** 및 **추천 파일 요약본** 제공
+   - **유사한 파일** **다운로드** 가능
+
+   ![image-20230819151454689](./assets/image-20230819151454689.png)
+
+​		 ![image-20230819151658534](./assets/image-20230819151658534.png)
 
 
 
-3. 키워드 입력
-   - 해당 키워드와 유사한 파일 상위 5개 추천
-
-![image-20230817162933617](./assets/image-20230817162933617.png)
-
-4. 파일 다운로드
-
-## 2. 업로드 파일과 유사한 파일 찾기
-
-1. **업로드해서 비슷한 파일 찾기** 클릭
-
-   ![image-20230817162852110](./assets/image-20230817162852110.png)
-
-2. 파일 업로드 및 Upload 버튼 클릭
-
-3. 업로드한 파일과 유사한 파일 상위 10개 추천
-
-   - 유사한 파일 요약 시, 비동기 처리로 우선 요약 처리된 파일부터 렌더링
-
-   ![image-20230817163123588](./assets/image-20230817163123588.png)
-
-4. 파일 다운로드 및 확인
+![image-20230819151807393](./assets/image-20230819151807393.png)
