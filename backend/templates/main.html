@@ -73,6 +73,16 @@ document.getElementById("searchBtn").addEventListener("click", function(e) {
 
 document.getElementById("fileInput").addEventListener("change", function() {
     if (this.files && this.files.length > 0) {
+        const file = this.files[0];
+        const validFileTypes = ['text/plain', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']; // MIME type 기준
+        const isValidFileType = validFileTypes.includes(file.type);
+
+        // 유효하지 않은 파일이 업로드 됐을 경우
+        if (!isValidFileType) {
+            alert('유효한 파일 형식이 아닙니다. txt 또는 docx 파일을 업로드해주세요.');
+            return;
+        }
+
         let formData = new FormData();
         formData.append('file', this.files[0]);
 
@@ -113,7 +123,7 @@ function searchKeyword() {
     .then(data => {
         // 메시지를 숨깁니다.
         $('#loadingMessage').remove();
-        
+
         // 결과를 웹 페이지에 렌더링하기
         let container = document.getElementById('result-container');
         container.innerHTML = '';
