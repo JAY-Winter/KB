@@ -79,19 +79,27 @@ async def summary_by_path(path: str = Form(...), model: BartForConditionalGenera
     '''
     from main import Redis_Instance
     from main import MainInstance as MainInstance
-
+    print(1)
     # Redis 를 활용한 Cache 적용
     redis_client = Redis_Instance.redis_client
+    print(2)
     SEARCH_DIRECTORY_PATH = MainInstance.get_instance().get_SEARCH_DIRECTORY_PATH()
+    print(SEARCH_DIRECTORY_PATH)
+    print(3)
     hash_key = 'summaryAPI' +  SEARCH_DIRECTORY_PATH + '/' + path
+    print(4)
 
     cached_result = redis_client.get(hash_key)
+    print(5)
     if cached_result:
+        print('yes')
         return eval(cached_result.decode('utf-8'))
     else:
+        print('no')
         # 파일 경로에서 실제 문서 읽기
-        document = await read_file_from_path(path)  
-        
+        print(path)
+        document = read_file_from_path(path)  
+        print(document)
         kobart_summary = summary_KOBART(document, model, tokenizer)
 
         results = {'kobart_summary': kobart_summary}

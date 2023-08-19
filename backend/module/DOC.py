@@ -35,7 +35,7 @@ def docx_to_text(file_path):
     return ' '.join(paragraph.text for paragraph in doc.paragraphs)
 
 
-async def read_file_from_path(path: str) -> str:
+def read_file_from_path(path: str) -> str:
     '''
     주어진 경로에서 파일을 읽어 텍스트를 반환합니다.
     '''
@@ -43,8 +43,8 @@ async def read_file_from_path(path: str) -> str:
         if path.endswith('.docx'):
             return read_docx(path)
         if path.endswith('.txt'):
-            async with aiofiles.open(path, mode='r', encoding='utf-8') as f:
-                return await f.read()
+            with open(path, mode='r', encoding='utf-8') as f:
+                return f.read()
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
