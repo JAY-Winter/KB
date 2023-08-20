@@ -27,16 +27,20 @@
 
 ## 1. 도커 컨테이너 구동
 
+````
 ```
-# Dockerfile 다운로드
-wget https://raw.githubusercontent.com/JAY-Winter/KB/main/Dockerfile
-
-# Docker-Compose 파일 다운로드
-wget https://raw.githubusercontent.com/JAY-Winter/KB/main/docker-compose.yml
-
-# 구동 명령어
-docker-compose up -d
+docker run -itd \
+--name kb-fast \
+-p 8000:8000 \
+-e SEARCH_DIRECTORY_PATH='/app/KB/file' \
+-e KOBART_MODEL_PATH='/app/KB/ko-bart' \
+rubat0/kb-fast-app
 ```
+1. `rubat0/kb-fast-app` : 배포 도커 이미지를 활용하여 컨테이너 구동
+2. `-e SEARCH_DIRECTORY_PATH` : 파일 유사도 검색 시, 조회할 폴더 경로 환경변수 지정
+3. `-e KOBART_MODEL_PATH` : 파일 요약 시, 사용할 KO-BART 모델 경로 환경변수 지정
+---
+````
 
 - 같은 경로에 다운로드 후 명령어 시행
 
