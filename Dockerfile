@@ -1,13 +1,9 @@
 # 기본 이미지 설정
 FROM python:3.9
 
-# git, unzip 설치
-RUN apt-get update && apt-get install -y git unzip
-
-# 필요한 패키지 설치
-RUN pip install --upgrade pip
-RUN pip install uvicorn aiofiles python-docx fastapi scikit-learn torch \
-    kobart_transformers transformers python-multipart redis
+RUN apt-get update && apt-get install -y git unzip && \
+    pip install --upgrade pip && \
+    pip install uvicorn aiofiles python-docx fastapi scikit-learn torch kobart_transformers transformers python-multipart redis
 
 # GitHub 저장소 다운로드
 WORKDIR /app
