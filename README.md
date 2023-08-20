@@ -1,11 +1,23 @@
 # KB financial 공모전
-**유사문서 검색 및 요약 서비스**
+- 개요 : 키워드 작성 혹은 파일 업로드로 해당 요청값과 유사한 파일 검색 SW
 
-⇒ 기존 작성되어 있는 행내 각종 품의문, 시행문을 원하는 내용 키워드 검색 또는 파일 업로드를 통해
+- 현 문제 : 
 
-**가장 적합한 문서를 찾는 검색 AI**
+    시행문, 품의문 작성 시 기작성 문서 기반 하 작성. 
+    다만, 유사한 문서를 검색하는 과정에 소모되는 시간이 많음
 
-⇒ 본부부서에서 각종 시행문, 품의문 작성 시 기존에 작성했던 유사한 문서를 참고하는 경우가 많기 때문에 원하는 양식을 AI가 인식하여 쉽게 검색할 수 있다면 업무시간 단축이 가능할 것으로 생각함 검색 키워드에 맞는 각종 품의문이나 시행문을 가장 조회수가 높거나 저장횟수가 많은 것부터 나열하는 등으로 중요도를 AI가 판정하여 제시해준다면 문서탐색시간을 줄일 수 있을 것으로 생각함
+- 해결 방안 :
+
+    요청된 키워드 혹은 문서 기반으로 검색을 허용할 폴더 내 문서들과 유사도 비교 후 
+    가장 유사도가 높은 문서 리스트를 제공
+
+- 기대 효과 : 
+  
+    기존 시행문, 품의문 작성 소요 시간을 현저하게 줄일 수 있을 것이라고 판단
+
+- 참고 :
+
+    *KB국민은행 제5회 Future Finance A.I. Challenge 「현직자 Pick」 리스트
 
 ---
 
@@ -13,13 +25,18 @@
 
 1. [EXPORT](#export)
 2. [TEST](#test)
-3. [ 키워드 별 유사한 파일 찾기](#1-키워드-별-유사한-파일-찾기)
-4. [ 파일 업로드 검색 기능](#2-파일-업로드-검색-기능)
-5. [프로세스 설명](#프로세스-설명)
+3. [키워드 별 유사한 파일 찾기](#1-키워드-별-유사한-파일-찾기)
+4. [파일 업로드 검색 기능](#2-파일-업로드-검색-기능)
+5. [데이터 전처리](#데이터 전처리)
+6. [서비스 프로세스](#서비스 프로세스)
 
 ---
 
-# EXPORT
+# EXEC
+
+- 아래 절차에 따라 **프로토타입**을 **직접 실행**하실 수 있습니다.
+
+---
 
 ## 0. 도커 다운로드
 
@@ -36,16 +53,14 @@ docker run -itd \
 rubat0/kb-fast-app
 ```
 
-- 같은 경로에 다운로드 후 명령어 시행
+- **같은 경로에 다운로드 후 명령어 시행**
 - `rubat0/kb-fast-app` : 배포 도커 이미지를 활용하여 컨테이너 구동
 2. `-e SEARCH_DIRECTORY_PATH` : 파일 유사도 검색 시, 조회할 폴더 경로 환경변수 지정
 3. `-e KOBART_MODEL_PATH` : 파일 요약 시, 사용할 KO-BART 모델 경로 환경변수 지정
 
 ---
 
-# TEST
-
-## 0. 도커 컨테이너 구동(위 내용 참고)
+# 기능 설명
 
 ## 1. 키워드 별 유사한 파일 찾기
 
@@ -78,19 +93,44 @@ rubat0/kb-fast-app
 
 ---
 
-# 프로세스 설명
+# 데이터 전처리
 
-## 1. 캐시를 활용한 응답 속도 개선
+- 학습 데이터셋 : AI Hub 문서 요약 테스트 - 뉴스 기사 **24만건**
+- 데이터 컬럼 중 `text`, `abstractive`  만 사용하여 행 별로 데이터 추출 및 `tsv` 확장자로 별도 학습 데이터 저장
+- 전처리 코드
 
-- **결과 : 관련 문서 요약 총 응답 시간 15.75 -> 2.16**
+```python
+import json
 
-- 초기 검색
+# 파일에서 JSON 데이터 불러오기
+with open("./train_original.json", "r", encoding="utf-8") as f:
+    data = json.load(f)
 
-  ![image-20230819152441963](./assets/image-20230819152441963.png)
+# 변환된 값을 저장할 리스트 생성
+rows = []
 
-- 재검색 결과 값
+for document in data["documents"]:
+    # text 값 (news로 바꿀 예정) 추출
+    text_value = []
+    for sentence_group in document["text"]:
+        for sentence in sentence_group:
+            text_value.append(sentence["sentence"])
+    news = " ".join(text_value)
 
-  ![image-20230819152937296](./assets/image-20230819152937296.png)
+    # abstractive 값 (summary로 바꿀 예정) 추출
+    summary = " ".join(document["abstractive"])
 
-# 2.
+    rows.append([news, summary])
 
+# tsv 파일로 저장
+with open("converted_data.tsv", "w", encoding="utf-8") as f:
+    f.write("news\\tsummary\\n")  # 컬럼명 작성
+    for row in rows:
+        f.write("\\t".join(row) + "\\n")
+```
+
+---
+
+# 서비스 프로세스
+
+![프로세스](./assets/프로세스.png)
