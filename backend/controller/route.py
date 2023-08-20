@@ -77,25 +77,13 @@ async def summary_by_path(path: str = Form(...), model: BartForConditionalGenera
     '''
     유사한 파일 요약 API 입니다.
     '''
-    from main import Redis_Instance
     from main import MainInstance as MainInstance
 
-    # Redis 를 활용한 Cache 적용
-    redis_client = Redis_Instance.redis_client
-    SEARCH_DIRECTORY_PATH = MainInstance.get_instance().get_SEARCH_DIRECTORY_PATH()
-    hash_key = 'summaryAPI' +  SEARCH_DIRECTORY_PATH + '/' + path
-    cached_result = redis_client.get(hash_key)
+    document = read_file_from_path(path)  
+    kobart_summary = summary_KOBART(document, model, tokenizer)
 
-    if cached_result:
-        return eval(cached_result.decode('utf-8'))
-    else:
-        # 파일 경로에서 실제 문서 읽기
-        document = read_file_from_path(path)  
-        kobart_summary = summary_KOBART(document, model, tokenizer)
-
-        results = {'kobart_summary': kobart_summary}
-        redis_client.set(hash_key, str(results), ex=3600)
-        return results
+    results = {'kobart_summary': kobart_summary}
+    return results
 
     
 @router.get('/search/keyword')

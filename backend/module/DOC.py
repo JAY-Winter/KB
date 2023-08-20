@@ -65,33 +65,21 @@ async def compare_similarity(uploaded_file_name, uploaded_file_content, file_typ
     업로드한 파일과 로컬 파일의 유사도를 비교합니다.
     '''
     from module.SINGLETONE import MainInstance as MainInstance
-    from main import Redis_Instance
 
-    # Redis 를 활용한 Cache 적용
-    redis_client = Redis_Instance.redis_client
-    hash_key = 'uploadAPI' + search_directory_path + '/' +uploaded_file_name
+    all_files = MainInstance.get_instance().get_all_files()
+    documents = MainInstance.get_instance().get_documents()
+    vectorizer = MainInstance.get_instance().get_vectorizer()
+    tfidf_matrix = MainInstance.get_instance().get_tfidf_matrix()
+    uploaded_file_vector = vectorizer.transform([uploaded_file_content])
 
-    cached_result = redis_client.get(hash_key)
+    # 마지막 문서 (업로드된 문서)와 기존 문서들의 유사도를 계산합니다.
+    similarities = cosine_similarity(uploaded_file_vector, tfidf_matrix)
 
-    if cached_result:
-        return eval(cached_result.decode('utf-8'))
-    else:
-        all_files = MainInstance.get_instance().get_all_files()
-        documents = MainInstance.get_instance().get_documents()
-        vectorizer = MainInstance.get_instance().get_vectorizer()
-        tfidf_matrix = MainInstance.get_instance().get_tfidf_matrix()
-        uploaded_file_vector = vectorizer.transform([uploaded_file_content])
+    # 유사도와 파일 경로를 결합하고 유사도 순으로 정렬합니다.
+    sorted_files = sorted(zip(similarities[0], all_files), key=lambda x: x[0], reverse=True)
 
-        # 마지막 문서 (업로드된 문서)와 기존 문서들의 유사도를 계산합니다.
-        similarities = cosine_similarity(uploaded_file_vector, tfidf_matrix)
+    # 정렬된 파일 10개를 반환합니다.
+    RETURN_CNT = 10
+    results = [file for file in sorted_files[:RETURN_CNT]]
 
-        # 유사도와 파일 경로를 결합하고 유사도 순으로 정렬합니다.
-        sorted_files = sorted(zip(similarities[0], all_files), key=lambda x: x[0], reverse=True)
-
-        # 정렬된 파일 10개를 반환합니다.
-        RETURN_CNT = 10
-        results = [file for file in sorted_files[:RETURN_CNT]]
-        
-        # Redis 에 해당 파일과 연관된 파일 값을 저장합니다
-        redis_client.set(hash_key, str(results), ex=3600)
-        return results
+    return results
