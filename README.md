@@ -27,8 +27,8 @@
 2. [TEST](#test)
 3. [키워드 별 유사한 파일 찾기](#1-키워드-별-유사한-파일-찾기)
 4. [파일 업로드 검색 기능](#2-파일-업로드-검색-기능)
-5. [데이터 전처리](데이터 전처리)
-6. [서비스 프로세스](서비스 프로세스)
+5. [데이터 전처리](#데이터-전처리)
+6. [서비스 프로세스](#서비스-프로세스)
 
 ---
 
@@ -96,38 +96,10 @@ rubat0/kb-fast-app
 # 데이터 전처리
 
 - 학습 데이터셋 : AI Hub 문서 요약 테스트 - 뉴스 기사 **24만건**
+- 특수문자 제거 : 의미 파악에 불필요하다고 판단, 길이 축소 위해 제거
 - 데이터 컬럼 중 `text`, `abstractive`  만 사용하여 행 별로 데이터 추출 및 `tsv` 확장자로 별도 학습 데이터 저장
-- 전처리 코드
 
-```python
-import json
-
-# 파일에서 JSON 데이터 불러오기
-with open("./train_original.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
-
-# 변환된 값을 저장할 리스트 생성
-rows = []
-
-for document in data["documents"]:
-    # text 값 (news로 바꿀 예정) 추출
-    text_value = []
-    for sentence_group in document["text"]:
-        for sentence in sentence_group:
-            text_value.append(sentence["sentence"])
-    news = " ".join(text_value)
-
-    # abstractive 값 (summary로 바꿀 예정) 추출
-    summary = " ".join(document["abstractive"])
-
-    rows.append([news, summary])
-
-# tsv 파일로 저장
-with open("converted_data.tsv", "w", encoding="utf-8") as f:
-    f.write("news\\tsummary\\n")  # 컬럼명 작성
-    for row in rows:
-        f.write("\\t".join(row) + "\\n")
-```
+- 불용어처리 -> tf-idf 이용한 문서 유사도 비교 목적, 문서 요약에는 사용 X
 
 ---
 
